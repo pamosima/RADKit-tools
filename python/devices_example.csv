@@ -1,0 +1,2 @@
+name(mandatory),host(mandatory),deviceType(mandatory),description,jumphostUuid,sourceKey,sourceDevUuid,metaData,enabled,forwardedTcpPorts,terminal.port,terminal.connectionMethod,terminal.username,terminal.enableSet,terminal.useInsecureAlgorithms,terminal.useTunnelingIfJumphost,terminal.password,terminal.enable,terminal.privateKeyPassword,terminal.privateKey
+C9300-1,10.13.254.161,IOS_XE,,,,,,True,,22,SSH,my-username,True,,,my-password,my-secrect,,

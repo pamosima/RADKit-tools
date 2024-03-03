@@ -1,0 +1,11 @@
+plugin: cisco.radkit.radkit
+strict: False
+keyed_groups:
+  # Group devices based on device type (ex radkit_device_type_IOS)
+  - prefix: radkit_device_type
+    # trunk-ignore(yamllint/quoted-strings)
+    key: "device_type"
+  # Group devices based on description
+  - prefix: radkit_description
+    # trunk-ignore(yamllint/quoted-strings)
+    key: "description"
