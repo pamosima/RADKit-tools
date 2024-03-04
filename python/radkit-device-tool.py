@@ -30,8 +30,8 @@ from netutils.interface import canonical_interface_name
 from dnacentersdk import api
 
 # Adjust the following variables according your needs
-RADkit_URL = "https://localhost:8081/api/v1"
-RADkit_USERNAME = "superadmin"
+RADKit_URL = "https://localhost:8081/api/v1"
+RADKit_USERNAME = "superadmin"
 MERAKI_URL = "https://api.meraki.com/api/v1/"
 DNAC_URL = "https://sandboxdnac.cisco.com"
 
@@ -181,7 +181,7 @@ def dnac_prepare_and_write_json(devices):
     click.echo(f"Devices written to {output_file}")
     
 
-# Upload devices from JSON file to RADkit service
+# Upload devices from JSON file to RADKit service
 def upload_devices_to_radkit_service_from_json():
     json_file = input("  Enter Input JSON file: ")
     devices = []
@@ -208,7 +208,7 @@ def upload_devices_to_radkit_service_from_json():
             )
             devices.append(device)
     try:
-        with ControlAPI.create(base_url=RADkit_URL, admin_name=RADkit_USERNAME, admin_password=getpass("  Enter RADkit superadmin password: ")) as service:
+        with ControlAPI.create(base_url=RADKit_URL, admin_name=RADKit_USERNAME, admin_password=getpass("  Enter RADKit password: ")) as service:
             print(f"Imported {len(devices)} devices from JSON file.")
 
             if devices:
@@ -221,9 +221,9 @@ def upload_devices_to_radkit_service_from_json():
             else:
                 print("No devices imported from JSON.")
     except Exception as e:
-        print(f"Error while connecting to RADkit service or creating devices: {e}")
+        print(f"Error while connecting to RADKit service or creating devices: {e}")
         
-# Upload devices from CSV file to RADkit service
+# Upload devices from CSV file to RADKit service
 def upload_devices_to_radkit_service_from_csv():
     csv_file = input("  Enter Input CSV file: ")
     devices = []
@@ -245,7 +245,7 @@ def upload_devices_to_radkit_service_from_csv():
             )
             devices.append(device)
     try:
-        with ControlAPI.create(base_url=RADkit_URL, admin_name="superadmin", admin_password=getpass("  Enter RADkit superadmin password: ")) as service:
+        with ControlAPI.create(base_url=RADKit_URL, admin_name="superadmin", admin_password=getpass("  Enter RADKit superadmin password: ")) as service:
             print(f"Imported {len(devices)} devices from CSV file.")
 
             if devices:
@@ -258,7 +258,7 @@ def upload_devices_to_radkit_service_from_csv():
             else:
                 print("No devices imported from CSV.")
     except Exception as e:
-        print(f"Error while connecting to RADkit service or creating devices: {e}")
+        print(f"Error while connecting to RADKit service or creating devices: {e}")
 
 def get_organization_switch_ports(dashboard, organization_id, network_id):
     response = dashboard.switch.getOrganizationSwitchPortsBySwitch(organization_id, networkIds=network_id, total_pages='all')
@@ -328,14 +328,14 @@ def create_yaml(json_data, output_dir):
 @click.command()
 @click.option('--output_dir', default='../ansible/device_vars', help='Output directory for YAML files')
 def main(output_dir):
-    print("Welcome to the RADkit Devices Tool")
+    print("Welcome to the RADKit Devices Tool")
     print("----------------------------------")
     while True:
         click.echo("Choose an action:")
         click.echo("  a) Get devices from Meraki Dashboard and write to JSON file")
         click.echo("  b) Get devices from Catalyst Center and write to JSON file")
-        click.echo("  c) Upload devices to RADkit service from JSON file")
-        click.echo("  d) Upload devices to RADkit service from CSV file")
+        click.echo("  c) Upload devices to RADKit service from JSON file")
+        click.echo("  d) Upload devices to RADKit service from CSV file")
         click.echo("  e) Get VLAN list per device from Meraki Dashboard and write to YAML file(s)")
         click.echo("  x) Exit")
         choice = click.prompt("Enter your choice (a - e, or x)")
