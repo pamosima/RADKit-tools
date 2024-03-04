@@ -29,22 +29,38 @@ from radkit_common.utils.formatting import to_canonical_name
 from netutils.interface import canonical_interface_name
 from dnacentersdk import api
 
-# Modify API URL's
+# Adjust the following variables according your needs
 RADkit_URL = "https://localhost:8081/api/v1"
+RADkit_USERNAME = "superadmin"
 MERAKI_URL = "https://api.meraki.com/api/v1/"
 DNAC_URL = "https://sandboxdnac.cisco.com"
 
 # Initialize Meraki Dashboard API
 def initialize_dashboard():
     print("Step 1 - Initialize Meraki Dashboard")
-    return meraki.DashboardAPI(
-        api_key=getpass(" Enter Meraki API key: "),
-        base_url=MERAKI_URL,
-        output_log=False,
-        log_file_prefix=os.path.basename(__file__)[:-3],
-        log_path='',
-        print_console=False
-    )
+
+    # Check if MERAKI_API_KEY environment variable exists and is not empty
+    api_key = os.getenv("MERAKI_API_KEY")
+    if api_key and api_key.strip():
+        # Use MERAKI_API_KEY if it's provided and not empty
+        return meraki.DashboardAPI(
+            api_key=api_key.strip(),
+            base_url=MERAKI_URL,
+            output_log=False,
+            log_file_prefix=os.path.basename(__file__)[:-3],
+            log_path='',
+            print_console=False
+        )
+    else:
+        # Fall back to prompting user for the API key
+        return meraki.DashboardAPI(
+            api_key=getpass(" Enter Meraki API key: "),
+            base_url=MERAKI_URL,
+            output_log=False,
+            log_file_prefix=os.path.basename(__file__)[:-3],
+            log_path='',
+            print_console=False
+        )
 
 # Get devices from Meraki Dashboard
 def get_devices_from_meraki(dashboard, network_id):
@@ -192,7 +208,7 @@ def upload_devices_to_radkit_service_from_json():
             )
             devices.append(device)
     try:
-        with ControlAPI.create(base_url=RADkit_URL, admin_name="superadmin", admin_password=getpass("  Enter RADkit superadmin password: ")) as service:
+        with ControlAPI.create(base_url=RADkit_URL, admin_name=RADkit_USERNAME, admin_password=getpass("  Enter RADkit superadmin password: ")) as service:
             print(f"Imported {len(devices)} devices from JSON file.")
 
             if devices:
