@@ -33,7 +33,7 @@ To install and configure the project:
    ```
    export MERAKI_API_KEY=""
    ```
-   > [!NOTE]
+   > **NOTE**
    > If this variable is not set or is empty, you will be prompted to enter the API key when initializing the Meraki Dashboard API.
 5. Install RADkit Service based the follwing guide: https://radkit.cisco.com/docs/pages/start_installer.html
 6. Installation of ansible collectionis done with ansible-galaxy using the provided .tar.gz file where X.Y.Z is the ansible collection version (ex. 0.5.0).:
