@@ -256,4 +256,3 @@ fabric.properties
 
 # Custom
 .vscode/
-ansible/device_vars/*.yaml
