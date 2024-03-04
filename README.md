@@ -6,15 +6,19 @@ The "Cisco RADKit Device Provisioning and VLAN Configuration Tool" automates dev
 
 ## Use Case Description
 
-This tool addresses the challenge of automating device provisioning and VLAN configuration for Cisco Catalyst switches, enhancing network management efficiency. It simplifies the process by leveraging Cisco RADKit for device provisioning and Ansible playbooks for VLAN configuration. Challenges involved ensuring seamless integration with RADKit APIs and creating Ansible playbooks for VLAN configuration.
+This tool simplifies the process of automating device provisioning and VLAN configuration for Cisco Catalyst switches, enhancing network management efficiency. By leveraging Ansible playbooks, it offers a seamless solution to modify VLAN configurations for Catalyst Switches monitored in the Meraki Dashboard. With the integrated RADKit service, it's possible to execute the Ansible Playbooks without the need to be on the same network as the devices.
+
+![Modify VLAN's with Cloud Monitoring for Catalyst](img/MerakiRADKitDemo.gif)
+
+The tool consists of two components:
 
 ### [Python Click Application](#python-click-application)
 
-![Create JSON file from Meraki Dashboard](img/create_json_from_meraki.gif)
+This component retrieves devices from the Meraki Dashboard and transfers them to the RADKit service, along with retrieving the current VLAN configuration.
 
 ### [Ansible Playbooks](#ansible-playbooks)
 
-![Ansible Playbook to create VLAN's](img/create_vlan.gif)
+These playbooks facilitate the configuration of devices through the RADKit service.
 
 ## Installation
 
