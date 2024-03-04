@@ -29,6 +29,12 @@ To install and configure the project:
    export RADKIT_ANSIBLE_IDENTITY=""
    export RADKIT_ANSIBLE_SERVICE_SERIAL=""
    ```
+   Optionally, you can set the environment variable MERAKI_API_KEY to provide your Meraki Dashboard API key:
+   ```
+   export MERAKI_API_KEY=""
+   ```
+   > [!NOTE]
+   > If this variable is not set or is empty, you will be prompted to enter the API key when initializing the Meraki Dashboard API.
 5. Install RADkit Service based the follwing guide: https://radkit.cisco.com/docs/pages/start_installer.html
 6. Installation of ansible collectionis done with ansible-galaxy using the provided .tar.gz file where X.Y.Z is the ansible collection version (ex. 0.5.0).:
    ```
