@@ -10,45 +10,112 @@ This tool simplifies the process of automating device provisioning and VLAN conf
 
 ![Modify VLAN's with Cloud Monitoring for Catalyst](img/MerakiRADKitDemo.gif)
 
-The tool consists of two components:
+The tool consists of three components:
 
 ### [Python Click Application](#python-click-application)
 
-This component retrieves devices from the Meraki Dashboard and transfers them to the RADKit service, along with retrieving the current VLAN configuration.
+This component retrieves devices from the Meraki Dashboard or Cisco Catalyst Center and transfers them to the RADKit service, along with retrieving the current VLAN configuration.
 
 ### [Ansible Playbooks](#ansible-playbooks)
 
 These playbooks facilitate the configuration of devices through the RADKit service.
 
+### [GitLab CI/CD Integration](#gitlab-ci/cd-integration)
+
+Integrate with GitLab CI/CD to automate the execution of Ansible playbooks for creating VLANs and changing L2 interface configurations.
+
 ## Installation
 
 To install and configure the project:
 
-1. Clone the repository.
-2. Install dependencies: `pip install -r requirements.txt`
-3. Install Python binary packages of RADKit. Please visit the [downloads area](https://radkit.cisco.com/downloads/release/) and get the RADKit wheels archive for your system. This packages can be installed using the pip command. For more details visit [radkit.cisco.com](https://radkit.cisco.com/docs/pages/start_pip_wheels.html)
-4. Configure environment variables:
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/pamosima/RADKit-tools radkit-tool
    ```
-   export RADKIT_ANSIBLE_CLIENT_PRIVATE_KEY_PASSWORD_BASE64=$(echo -n '' | base64)
-   export RADKIT_ANSIBLE_IDENTITY=""
-   export RADKIT_ANSIBLE_SERVICE_SERIAL=""
+
+2. Navigate to the repository directory:
+
+   ```bash
+   cd radkit-tool
    ```
-   Optionally, you can set the environment variable MERAKI_API_KEY to provide your Meraki Dashboard API key:
+
+3. Create a virtual environment:
+
+   ```bash
+   python3 -m venv .venv
    ```
-   export MERAKI_API_KEY=""
+
+4. Activate the virtual environment:
+
+   ```bash
+   source .venv/bin/activate
    ```
-   > **NOTE**
-   > If this variable is not set or is empty, you will be prompted to enter the API key when initializing the Meraki Dashboard API.
-5. Install RADKit Service based the follwing guide: https://radkit.cisco.com/docs/pages/start_installer.html
-6. Installation of ansible collectionis done with ansible-galaxy using the provided .tar.gz file where X.Y.Z is the ansible collection version (ex. 0.5.0).:
+
+5. Install dependencies:
+
+   ```bash
+   pip install -r requirements.txt
    ```
+
+6. Configure environment variables by editing the `bash-script.sh` file:
+
+   ```bash
+   nano /bash-script.sh
+   ```
+
+   Adjust the environment variables as needed. Example:
+
+   ```bash
+   export RADKIT_ANSIBLE_CLIENT_PRIVATE_KEY_PASSWORD_BASE64=$(echo -n 'my-password' | base64)
+   export RADKIT_ANSIBLE_IDENTITY="my-username"
+   export RADKIT_ANSIBLE_SERVICE_SERIAL="my-service-id"
+   ```
+
+   Optionally, you can set the environment variable `MERAKI_API_KEY` to provide your Meraki Dashboard API key.
+
+   ```bash
+   export MERAKI_API_KEY="my-meraki-apy-key"
+   ```
+
+   > **NOTE**: If `MERAKI_API_KEY` is not set or is empty, you will be prompted to enter the API key when initializing the Meraki Dashboard API.
+
+7. Source the `bash-script.sh` file to apply the environment variables:
+
+   ```bash
+   source /bash-script.sh
+   ```
+
+8. Install RADKit Service based on the following guide: [RADKit Installation Guide](https://radkit.cisco.com/docs/pages/start_installer.html)
+
+9. Installation of the Ansible collection is done with ansible-galaxy using the provided .tar.gz file where X.Y.Z is the Ansible collection version (e.g., 0.5.0):
+
+   ```bash
    ansible-galaxy collection install ansible-cisco-radkit-X.Y.Z.tar.gz --force
    ```
 
-## Configuration
+10. (Optional) Build the Docker image for the GitLab CI/CD runner:
 
-The tool is configurable through environment variables, allowing users to specify RADKit authentication details and Ansible configuration.
-Fore more details check https://radkit.cisco.com/
+    - Navigate to the Docker folder:
+
+      ```bash
+      cd gitlab-cicd/docker
+      ```
+
+    - Download the necessary files from [RADKit Downloads](https://radkit.cisco.com/downloads/):
+
+      - **Cisco RADkit Collection File**: Download the `ansible-cisco-radkit-X.Y.Z.tar.gz` file.
+      - **Cisco RADkit Python Package Archive**: Download the `cisco_radkit_X.Y.Z_pip_linux_x86.tgz` file.
+
+    - Copy the downloaded files into the `docker` directory.
+
+    - Build the Docker image using the following command:
+
+      ```bash
+      docker build -t radkit-runner .
+      ```
+
+Once the image is built successfully, you can use it as the base image for your GitLab CI/CD runner.
 
 ## Usage
 
@@ -59,8 +126,10 @@ The Python Click application is located in the python subfolder:
 To use the Python Click application:
 
 ```
+
 cd python
 python radkit-device-tool.py
+
 ```
 
 ### Options
@@ -94,7 +163,9 @@ The Ansible Playbooks are located in the ansible subfolder.
 The cisco.radkit.radkit inventory plugin allows you to create a dynamic inventory from a remote RADKit service.
 
 ```
+
 ansible-inventory -i radkit_devices.yml --list --yaml
+
 ```
 
 #### RADKit Connection Plugin
@@ -106,7 +177,9 @@ The connection Plugin allow you to utilize existing Ansible modules, but connect
 This Playbook is using the RADKit Plugins and does a "show version".
 
 ```
+
 ansible-playbook -i radkit_devices.yml show_version-playbook.yml --limit radkit_device_type_IOS_XE
+
 ```
 
 #### L2 Interface Configuration Playbook
@@ -114,7 +187,9 @@ ansible-playbook -i radkit_devices.yml show_version-playbook.yml --limit radkit_
 This Playbook is using the RADKit Plugins and configures the L2 interfaces of a Catalyst Switch based on the device variable YAML file which can be created by the python click application.
 
 ```
+
 ansible-playbook -i radkit_devices.yml l2_interface_config-playbook.yml
+
 ```
 
 #### VLAN Configuration Playbook
@@ -122,8 +197,35 @@ ansible-playbook -i radkit_devices.yml l2_interface_config-playbook.yml
 This Playbook is using the RADKit Plugins and configures VLAN(s) on Catalyst Switches based on vars/vlans.yaml.
 
 ```
+
 ansible-playbook -i radkit_devices.yml vlan_config-playbook.yml
+
 ```
+
+## GitLab CI/CD Integration
+
+You can integrate this tool into your GitLab CI/CD pipeline to automate VLAN creation and L2 interface configuration changes using Ansible playbooks.
+
+### Pipeline Explanation
+
+The GitLab CI/CD configuration defines two stages:
+
+1. **deploy_l2_interface_config**: This stage is responsible for deploying L2 interface configurations using Ansible playbooks.
+
+   - **Script**: It runs the Ansible playbook `l2_interface_config-playbook.yml`.
+   - **Rules**:
+     - It executes if the pipeline is triggered by a web (manual) action on the default branch and the pipeline variable `$PIPELINE_NAME` is `"l2"`.
+     - It also executes if the pipeline is triggered by a push to the default branch, but only if there are changes in specific files related to L2 interface configurations.
+
+2. **deploy_vlan_config**: This stage is responsible for deploying VLAN configurations using Ansible playbooks.
+   - **Script**: It runs the Ansible playbook `vlan_config-playbook.yml`.
+   - **Rules**:
+     - It executes if the pipeline is triggered by a web (manual) action on the default branch and the pipeline variable `$PIPELINE_NAME` is `"vlan"`.
+     - It also executes if the pipeline is triggered by a push to the default branch, but only if there are changes in specific files related to VLAN configurations.
+
+### Runner Configuration
+
+The GitLab CI/CD runner for this pipeline is a Docker runner which includes Ansible, sshpass, and the necessary Cisco RADkit components for executing the Ansible playbooks.
 
 ## Known issues
 

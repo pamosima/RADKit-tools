@@ -1,0 +1,21 @@
+interfaces:
+  - name: GigabitEthernet1/0/1
+    description: Uplink
+    enabled: true
+    mode: trunk
+    trunk:
+      allowed_vlans: 255,1021
+      native_vlan: 255
+  - name: GigabitEthernet1/0/2
+    description: lan
+    enabled: false
+    mode: access
+    access:
+      vlan: 1021           
+  - name: GigabitEthernet1/0/5
+    description: AP
+    enabled: true
+    mode: trunk
+    trunk:
+      allowed_vlans: 255,1021
+      native_vlan: 255

@@ -19,13 +19,39 @@
     ansible_network_os: ios
   gather_facts: no
   tasks:
-    - name: Include VLAN configuration from external file
+    - name: Check if device-specific variables file exists
+      stat:
+        path: "device_vars/vlans/{{ inventory_hostname }}.yaml"
+      register: device_specific_var_file
+
+    - name: Set fact if device-specific variables file exists
+      set_fact:
+        ansible_local:
+          device_specific_var_file_exists: "{{ device_specific_var_file.stat.exists }}"
+
+    - name: Include default variables from external file
       include_vars:
         file: vars/vlans.yaml
-      when: inventory_hostname in groups['radkit_device_type_IOS_XE']
+      when: inventory_hostname in groups['radkit_device_type_IOS_XE'] and not ansible_local.device_specific_var_file_exists|default(false)
 
-    - name: Merge VLAN configuration with device configuration
+    - name: Include device-specific variables if available
+      include_vars:
+        file: "device_vars/vlans/{{ inventory_hostname }}.yaml"
+      when:
+        - inventory_hostname in groups['radkit_device_type_IOS_XE']
+        - ansible_local.device_specific_var_file_exists|default(false)
+
+    - name: Run IOS VLANs query to override VLAN configuration
       ios_vlans:
         config: "{{ vlans }}"
-        state: merged
-      when: inventory_hostname in groups['radkit_device_type_IOS_XE']
+        state: overridden
+      register: ios_vlans_result
+      ignore_errors: true
+
+    - name: Retry task if it fails a second time
+      when: ios_vlans_result is failed
+      block:
+        - name: Run IOS VLANs query a second time
+          ios_vlans:
+            config: "{{ vlans }}"
+            state: overridden

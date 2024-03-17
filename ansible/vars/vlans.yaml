@@ -1,13 +1,26 @@
 vlans:
-  - name: Vlan_10
+  - name: DATA
+    mtu: 1500
     vlan_id: 10
     state: active
     shutdown: disabled
-  - name: Vlan_20
+  - name: VOICE
+    mtu: 1500
     vlan_id: 20
     state: active
     shutdown: disabled
-  - name: Vlan_30
+  - name: GUEST
+    mtu: 1500
     vlan_id: 30
+    state: active
+    shutdown: disabled
+  - name: Mgmt
+    mtu: 1500
+    vlan_id: 255
+    state: active
+    shutdown: disabled
+  - name: Clients
+    mtu: 1500
+    vlan_id: 1021
     state: active
     shutdown: disabled
