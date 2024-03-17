@@ -14,7 +14,7 @@ The tool consists of three components:
 
 ### [Python Click Application](#python-click-application)
 
-This component retrieves devices from the Meraki Dashboard and transfers them to the RADKit service, along with retrieving the current VLAN configuration.
+This component retrieves devices from the Meraki Dashboard or Cisco Catalyst Center and transfers them to the RADKit service, along with retrieving the current VLAN configuration.
 
 ### [Ansible Playbooks](#ansible-playbooks)
 
