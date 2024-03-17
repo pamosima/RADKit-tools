@@ -20,7 +20,7 @@ This component retrieves devices from the Meraki Dashboard or Cisco Catalyst Cen
 
 These playbooks facilitate the configuration of devices through the RADKit service.
 
-### [GitLab CI/CD Integration](#gitlab-ci/cd-integration)
+### [GitLab CI/CD Integration](#gitlab-cicd-pipeline-explanation)
 
 Integrate with GitLab CI/CD to automate the execution of Ansible playbooks for creating VLANs and changing L2 interface configurations.
 
@@ -202,11 +202,7 @@ ansible-playbook -i radkit_devices.yml vlan_config-playbook.yml
 
 ```
 
-## GitLab CI/CD Integration
-
-You can integrate this tool into your GitLab CI/CD pipeline to automate VLAN creation and L2 interface configuration changes using Ansible playbooks.
-
-### Pipeline Explanation
+### GitLab CI/CD Pipeline Explanation
 
 The GitLab CI/CD configuration defines two stages:
 
@@ -223,7 +219,7 @@ The GitLab CI/CD configuration defines two stages:
      - It executes if the pipeline is triggered by a web (manual) action on the default branch and the pipeline variable `$PIPELINE_NAME` is `"vlan"`.
      - It also executes if the pipeline is triggered by a push to the default branch, but only if there are changes in specific files related to VLAN configurations.
 
-### Runner Configuration
+#### Runner Configuration
 
 The GitLab CI/CD runner for this pipeline is a Docker runner which includes Ansible, sshpass, and the necessary Cisco RADkit components for executing the Ansible playbooks.
 
