@@ -19,32 +19,50 @@
     ansible_network_os: ios
   gather_facts: no
   tasks:
-    - name: Include device-specific variables
+    - name: Check if device-specific variables file exists
+      stat:
+        path: "device_vars/l2/{{ inventory_hostname }}.yaml"
+      register: device_specific_var_file
+
+    - name: Set fact if device-specific variables file exists
+      set_fact:
+        ansible_local:
+          device_specific_var_file_exists: "{{ device_specific_var_file.stat.exists }}"
+
+    - name: Include default variables from external file
       include_vars:
-        file: "device_vars/{{ inventory_hostname }}.yaml"
-      tags: include_vars
+        file: vars/l2.yaml
+      when: inventory_hostname in groups['radkit_device_type_IOS_XE'] and not ansible_local.device_specific_var_file_exists|default(false)
+
+    - name: Include device-specific variables if available
+      include_vars:
+        file: "device_vars/l2/{{ inventory_hostname }}.yaml"
+      when:
+        - inventory_hostname in groups['radkit_device_type_IOS_XE']
+        - ansible_local.device_specific_var_file_exists|default(false)
 
     - name: Merge VLAN interface configuration
       cisco.ios.ios_l2_interfaces:
         config:
-          - name: "{{ item.interface.name }}"
-            mode: "{{ item.interface.mode }}"
+          - name: "{{ item.name }}"
+            mode: "{{ item.mode }}"
             access:
-              vlan: "{{ item.interface.access.vlan | default(omit) }}"
+              vlan: "{{ item.access.vlan | default(omit) }}"
             voice:
-              vlan: "{{ item.interface.voice.vlan | default(omit) }}"
+              vlan: "{{ item.voice.vlan | default(omit) }}"
             trunk:
-              allowed_vlans: "{{ item.interface.trunk.allowed_vlans | default(omit) }}"
-              native_vlan: "{{ item.interface.trunk.native_vlan | default(omit) }}"
-        state: merged
+              allowed_vlans: "{{ item.trunk.allowed_vlans | default(omit) }}"
+              native_vlan: "{{ item.trunk.native_vlan | default(omit) }}"
+        state: replaced
       loop: "{{ interfaces }}"
       when: inventory_hostname in groups['radkit_device_type_IOS_XE']
+
     - name: Merge interface configuration
       cisco.ios.ios_interfaces:
         config:
-          - name: "{{ item.interface.name }}"
-            description: "{{ item.interface.description }}"
-            enabled: "{{ item.interface.enabled }}"
-        state: merged
+          - name: "{{ item.name }}"
+            description: "{{ item.description }}"
+            enabled: "{{ item.enabled }}"
+        state: replaced
       loop: "{{ interfaces }}"
       when: inventory_hostname in groups['radkit_device_type_IOS_XE']

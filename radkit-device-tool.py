@@ -30,10 +30,10 @@ from netutils.interface import canonical_interface_name
 from dnacentersdk import api
 
 # Adjust the following variables according your needs
-RADKit_URL = "https://localhost:8081/api/v1"
+RADKit_URL = "https://192.168.99.103:8081/api/v1"
 RADKit_USERNAME = "superadmin"
 MERAKI_URL = "https://api.meraki.com/api/v1/"
-DNAC_URL = "https://sandboxdnac.cisco.com"
+DNAC_URL = "https://wlsn-dnac.its-best.ch"
 
 # Initialize Meraki Dashboard API
 def initialize_dashboard():
@@ -290,24 +290,26 @@ def create_yaml(json_data, output_dir):
             continue
 
         port_dict = {
-            'name': canonical_interface_name(interface_name),
-            'description': description,
-            'enabled': port['enabled'],
-            'mode': port['type']
+            'interface': {
+                'name': canonical_interface_name(interface_name),
+                'description': description,
+                'enabled': port['enabled'],
+                'mode': port['type']
+            }
         }
 
         # Check port mode
         if port['type'] == 'trunk':
-            port_dict['trunk'] = {
+            port_dict['interface']['trunk'] = {
                 'allowed_vlans': port['allowedVlans'],
                 'native_vlan': port['vlan']
             }
         elif port['type'] == 'access':
-            port_dict['access'] = {
+            port_dict['interface']['access'] = {
                 'vlan': port['vlan']
             }
             if port['voiceVlan'] is not None:
-                port_dict['voice'] = {
+                port_dict['interface']['voice'] = {
                     'vlan': port['voiceVlan']
                 }
 
@@ -315,7 +317,7 @@ def create_yaml(json_data, output_dir):
         yaml_data.append(port_dict)
 
     # Generate YAML output
-    output = yaml.dump({'interfaces': yaml_data}, default_flow_style=False, sort_keys=False)
+    output = yaml.dump({'system': [{'device_name': json_data['name']}], 'interfaces': yaml_data}, default_flow_style=False, sort_keys=False)
 
     # Write YAML output to file
     with open(filename, 'w') as yaml_file:
@@ -324,7 +326,7 @@ def create_yaml(json_data, output_dir):
 
 
 @click.command()
-@click.option('--output_dir', default='../ansible/device_vars/l2', help='Output directory for YAML files')
+@click.option('--output_dir', default='../ansible/device_vars', help='Output directory for YAML files')
 def main(output_dir):
     print("Welcome to the RADKit Devices Tool")
     print("----------------------------------")

@@ -34,6 +34,7 @@ doc/build/
 *.rar
 *.tar
 *.zip
+*.tgz
 
 # Logs and databases #
 *.log
@@ -256,3 +257,4 @@ fabric.properties
 
 # Custom
 .vscode/
+*.pem
